@@ -60,18 +60,26 @@ async function getOptions() {
     return { authors: [], org: null, limit: config.maxCharts };
   }
 
-  // Check for config defaults
-  const hasConfigDefaults = config.authorId || config.organizationId;
-  if (hasConfigDefaults) {
-    // Support comma-separated author IDs in config
-    const configAuthors = config.authorId 
-      ? config.authorId.split(',').map(id => id.trim()).filter(Boolean)
+  // Check for env vars or config defaults (CI mode - no prompts)
+  const authorId = process.env.AUTHOR_ID || config.authorId;
+  const orgId = process.env.ORGANIZATION_ID || config.organizationId;
+  
+  if (authorId || orgId) {
+    // Support comma-separated author IDs
+    const authors = authorId 
+      ? authorId.split(',').map(id => id.trim()).filter(Boolean)
       : [];
     return {
-      authors: configAuthors,
-      org: config.organizationId || null,
+      authors,
+      org: orgId || null,
       limit: config.maxCharts
     };
+  }
+  
+  // In CI (non-interactive), just fetch all
+  if (!process.stdin.isTTY) {
+    console.log('Non-interactive mode: fetching all accessible charts');
+    return { authors: [], org: null, limit: config.maxCharts };
   }
 
   // Interactive mode
