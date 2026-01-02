@@ -1,0 +1,71 @@
+name: Update Gallery
+
+on:
+  # Run daily at midnight UTC
+  schedule:
+    - cron: '0 0 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+  
+  # Also run on push to main (for initial setup)
+  push:
+    branches:
+      - main
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch charts from Datawrapper
+        run: npm run fetch
+        env:
+          DATAWRAPPER_TOKEN: ${{ secrets.DATAWRAPPER_TOKEN }}
+          AUTHOR_ID: ${{ vars.AUTHOR_ID }}
+          ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
+          CDN_BASE: ${{ vars.CDN_BASE }}
+
+      - name: Build site
+        run: npm run build
+        env:
+          BASE_PATH: '/${{ github.event.repository.name }}'
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
