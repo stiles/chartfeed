@@ -4,7 +4,7 @@ A responsive gallery that displays your Datawrapper charts. Auto-updates daily v
 
 ## Inspiration
 
-This project builds on [Stephen Stirling's tiled-graphic-wall](https://github.com/sstirling/tiled-graphic-wall), a template for manually curating a portfolio of graphics. Chartfeed automates the process by fetching directly from the Datawrapper API.
+This project builds on [Stephen Stirling's tiled-graphic-wall](https://github.com/sstirling/tiled-graphic-wall), a template for manually curating a portfolio of graphics. Chartfeed automates the process by fetching directly from the Datawrapper API. View mine at [https://mattstiles.me/chartfeed](https://mattstiles.me/chartfeed/).
 
 ## Features
 
