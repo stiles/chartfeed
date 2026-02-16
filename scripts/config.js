@@ -28,6 +28,6 @@ export default {
   maxCharts: 2000,
 
   // Only include published charts
-  publishedOnly: false
+  publishedOnly: true
 };
 
