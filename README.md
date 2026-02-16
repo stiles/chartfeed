@@ -8,7 +8,7 @@ This project builds on [Stephen Stirling's tiled-graphic-wall](https://github.co
 
 ## Features
 
-- Fetches charts from the Datawrapper API
+- Fetches charts from Datawrapper API
 - Filter by author ID or organization
 - Responsive grid layout
 - Search by keyword (title, description, source, byline)
