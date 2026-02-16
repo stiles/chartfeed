@@ -106,9 +106,13 @@ Go to your repo's **Settings > Secrets and variables > Actions** and add:
 
 In **Settings > Secrets and variables > Actions > Variables**, add:
 
-- `AUTHOR_ID`: Filter to a specific author
-- `ORGANIZATION_ID`: Filter to a specific team
+- `AUTHOR_ID`: Fetch charts by a single author ID (alternative to `ORGANIZATION_ID`)
+- `ORGANIZATION_ID`: Fetch all charts from a team (recommended for team members)
+- `FILTER_AUTHOR_IDS`: When using `ORGANIZATION_ID`, filter to specific author IDs (comma-separated, e.g., "672102,508399")
+- `FILTER_AUTHOR_NAME`: Alternative filter by author name (less precise, can match co-bylines)
 - `CDN_BASE`: Custom CDN URL
+
+**Note**: If you've changed your email in Datawrapper, you may have multiple author IDs. Use `ORGANIZATION_ID` with `FILTER_AUTHOR_IDS` to include charts from all your accounts.
 
 ### 4. Enable GitHub Pages
 
@@ -199,9 +203,13 @@ Each chart object stored in `charts.json` contains:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATAWRAPPER_TOKEN` | Yes | Your Datawrapper API token |
-| `AUTHOR_ID` | No | Filter charts by author ID |
-| `ORGANIZATION_ID` | No | Filter charts by team ID |
+| `AUTHOR_ID` | No | Fetch charts by a single author ID |
+| `ORGANIZATION_ID` | No | Fetch all charts from a team |
+| `FILTER_AUTHOR_IDS` | No | Filter by specific author IDs (comma-separated: "672102,508399") |
+| `FILTER_AUTHOR_NAME` | No | Filter by author name (less precise than IDs) |
 | `CDN_BASE` | No | Custom CDN URL for thumbnails |
+
+**Example**: `ORGANIZATION_ID=cnn FILTER_AUTHOR_IDS=672102,508399 npm run fetch` fetches all CNN charts, then filters to only those two author IDs.
 
 ## License
 

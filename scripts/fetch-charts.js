@@ -240,6 +240,9 @@ async function thumbnailExists(url) {
 function transformChart(chart) {
   const id = chart.publicId || chart.id;
   
+  // Use author.name if byline is empty (list endpoint returns empty describe fields)
+  const byline = chart.metadata?.describe?.byline || chart.author?.name || '';
+  
   return {
     id,
     title: chart.title || 'Untitled',
@@ -251,8 +254,9 @@ function transformChart(chart) {
     thumbnailUrl: getThumbnailUrl(chart),
     description: chart.metadata?.describe?.intro || '',
     source: chart.metadata?.describe?.['source-name'] || '',
-    byline: chart.metadata?.describe?.byline || '',
+    byline: byline,
     authorId: chart.authorId,
+    authorName: chart.author?.name || '',
     organizationId: chart.organizationId || chart.teamId
   };
 }
@@ -334,25 +338,45 @@ async function main() {
       .map(transformChart)
       .filter(chart => chart.publishedAt);
     
-    // Validate thumbnails exist (skip charts without valid images)
-    console.log('\nValidating thumbnails...');
-    const validated = [];
-    let skipped = 0;
-    
-    for (let i = 0; i < transformed.length; i++) {
-      const chart = transformed[i];
-      process.stdout.write(`\r  Checking ${i + 1}/${transformed.length}...`);
-      
-      const exists = await thumbnailExists(chart.thumbnailUrl);
-      if (exists) {
-        validated.push(chart);
-      } else {
-        skipped++;
-      }
+    // Filter by author IDs if specified (when fetching by org)
+    const filterByAuthorIds = process.env.FILTER_AUTHOR_IDS;
+    if (filterByAuthorIds) {
+      const authorIds = filterByAuthorIds.split(',').map(id => parseInt(id.trim(), 10));
+      const beforeFilter = transformed.length;
+      transformed = transformed.filter(chart => authorIds.includes(chart.authorId));
+      console.log(`\n  Filtered to ${transformed.length} charts by author IDs: ${authorIds.join(', ')} (from ${beforeFilter} total)`);
     }
     
-    transformed = validated;
-    console.log(`\n  Skipped ${skipped} charts without valid thumbnails`);
+    // Alternative: Filter by author name (less precise, can match co-bylines)
+    const filterByAuthor = process.env.FILTER_AUTHOR_NAME;
+    if (filterByAuthor && !filterByAuthorIds) {
+      const beforeFilter = transformed.length;
+      transformed = transformed.filter(chart => 
+        chart.authorName && chart.authorName.toLowerCase().includes(filterByAuthor.toLowerCase())
+      );
+      console.log(`\n  Filtered to ${transformed.length} charts by name "${filterByAuthor}" (from ${beforeFilter} total)`);
+    }
+    
+    // Validate thumbnails exist (skip charts without valid images)
+    // DISABLED: Temporarily skipping thumbnail validation to see full chart count
+    // console.log('\nValidating thumbnails...');
+    // const validated = [];
+    // let skipped = 0;
+    // 
+    // for (let i = 0; i < transformed.length; i++) {
+    //   const chart = transformed[i];
+    //   process.stdout.write(`\r  Checking ${i + 1}/${transformed.length}...`);
+    //   
+    //   const exists = await thumbnailExists(chart.thumbnailUrl);
+    //   if (exists) {
+    //     validated.push(chart);
+    //   } else {
+    //     skipped++;
+    //   }
+    // }
+    // 
+    // transformed = validated;
+    // console.log(`\n  Skipped ${skipped} charts without valid thumbnails`);
     
     transformed.sort((a, b) => 
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()

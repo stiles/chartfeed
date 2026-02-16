@@ -50,6 +50,8 @@ jobs:
           DATAWRAPPER_TOKEN: ${{ secrets.DATAWRAPPER_TOKEN }}
           AUTHOR_ID: ${{ vars.AUTHOR_ID }}
           ORGANIZATION_ID: ${{ vars.ORGANIZATION_ID }}
+          FILTER_AUTHOR_IDS: ${{ vars.FILTER_AUTHOR_IDS }}
+          FILTER_AUTHOR_NAME: ${{ vars.FILTER_AUTHOR_NAME }}
           CDN_BASE: ${{ vars.CDN_BASE }}
 
       - name: Build site

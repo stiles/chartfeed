@@ -25,9 +25,9 @@ export default {
 
   // Number of charts to fetch (max per API call is 100)
   // Set to a high number to fetch all; pagination is handled automatically
-  maxCharts: 500,
+  maxCharts: 2000,
 
   // Only include published charts
-  publishedOnly: true
+  publishedOnly: false
 };
 
